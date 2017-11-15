@@ -36,7 +36,7 @@
 		</div>
 		<!-- 显示表格数据-->
 		<div class="row">
-			<table class="table table-hover table-bordered">
+			<table class="table table-hover table-bordered" id="emps_table">
 				<thead>
 					<tr>
 						<th>ID</th>
@@ -48,24 +48,6 @@
 					</tr>
 				</thead>
 				<tbody>
-					<c:forEach items="${pageInfo.list}" var="emp">
-						<tr>
-							<td>${emp.id}</td>
-							<td>${emp.name}</td>
-							<td>${emp.gender}</td>
-							<td>${emp.email}</td>
-							<td>${emp.department.deptName}</td>
-							<td class="text-center" width="230"><button type="button"
-									class="btn btn-sm btn-primary">
-									<span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
-									修改
-								</button>
-								<button type="button" class="btn btn-sm btn-danger">
-									<span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
-									删除
-								</button></td>
-						</tr>
-					</c:forEach>
 				</tbody>
 			</table>
 		</div>
@@ -91,22 +73,56 @@
 	</div>
 	<script type="text/javascript">
 		//1、页面加载完成以后，直接去发送一个ajax请求，要到分页数据
-
 		$(function() {
 			$.ajax({
 				url : "${APP_PATH}/emps",
 				data : "pn=1",
 				type : "GET",
 				success : function(result) {
-					console.log(result);
-					
-					//解析并显示员工数据
-					//解析并显示分页信息
+					//console.log(result);
+					//1、解析并显示员工数据
+					build_emps_table(result);
+
+					//2、解析并显示分页信息
 				}
 			});
+		});
+		function build_emps_table(result) {
+			var emps = result.extend.pageInfo.list;
+			
+			$.each(emps, function(index, item) {
+				/*
+				<button type="button" class="btn btn-sm btn-primary">
+				<span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>修改</button>
+				*/
+				//构建按钮
+				var eidtBnt = $("<button></button>").addClass("btn btn-sm btn-primary")
+				.append($("<span></span>").addClass("glyphicon glyphicon-pencil")).append(" 编辑");
+				var delBnt = $("<button></button>").addClass("btn btn-sm btn-danger")
+				.append($("<span></span>").addClass("glyphicon glyphicon-trash")).append(" 删除");				
+				
+				//构建表格到#emps_table tbody表格中				
+				var empId = $("<td></td>").append(item.id);
+				var empName = $("<td></td>").append(item.name);
+				var empGender = $("<td></td>").append(item.gender);
+				var empEmail = $("<td></td>").append(item.email);
+				var empDepartment = $("<td></td>").append(item.department.deptName);
+				var empBnt = $("<td></td>").append(eidtBnt).append(" ").append(delBnt);				
+				
+				
+				$("<tr></tr>").append(empId)
+				.append(empName)
+				.append(empGender)
+				.append(empEmail)
+				.append(empDepartment)
+				.append(empBnt)
+				.appendTo("#emps_table tbody");				
+			})
+		}
 
-		})
+		function build_page_nav(result) {
+
+		}
 	</script>
-
 </body>
 </html>
