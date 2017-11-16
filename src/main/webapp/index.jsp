@@ -73,23 +73,19 @@
 				data : "pn=1",
 				type : "GET",
 				success : function(result) {
-					//console.log(result);
-					
+					//console.log(result);					
 					//1、解析并显示员工数据
-					build_emps_table(result);
-					
+					build_emps_table(result);					
 					//2、解析并显示员工数据
 					build_page_info(result);
-
 					//3、解析并显示分页信息
-					build_page_nav(result);
-					
+					build_page_nav(result);					
 				}
 			});
 		});
 		
 		//解析员工信息
-		function build_emps_table(result) {
+		function build_emps_table(result) {	
 			var emps = result.extend.pageInfo.list;
 			
 			$.each(emps, function(index, item) {
@@ -110,8 +106,7 @@
 				var empEmail = $("<td></td>").append(item.email);
 				var empDepartment = $("<td></td>").append(item.department.deptName);
 				var empBnt = $("<td></td>").addClass("operationwidth").append(eidtBnt).append(" ").append(delBnt);				
-				
-				
+								
 				$("<tr></tr>").append(empId)
 				.append(empName)
 				.append(empGender)
@@ -124,23 +119,32 @@
 		
 		//解析显示分页信息
 		function build_page_info(result){			
-			var pageInfo =result.extend.pageInfo;			
+			var pageInfo = result.extend.pageInfo;
 			$("#page_info_area").append("当前 "+pageInfo.pageNum+" 页, 每页 "+pageInfo.pageSize+" 条数据, 总 "+pageInfo.pages+" 页, 总 "+pageInfo.total+" 条记录");			
 		}
 		
 		//解析分页条信息
 		function build_page_nav(result) {
+			var navNums = result.extend.pageInfo.navigatepageNums;
 			
-			var ul = $("<ul ></ul >").appClass("pagination");
 			//<li><a href="${APP_PATH}/emps?pn=1">首页</a>
-			var firstPageLi = $("<li></li>").append($("<a></a>").append("首页")) ;
-			var prePageLi = $("<li></li>").append($("<a></a>").append("&laquo;")) ;
+			var ul = $("<ul></ul>").addClass("pagination");
+			var firstPageLi = $("<li></li>").append($("<a></a>").append("首页").attr("href","#")) ;
+			var prePageLi = $("<li></li>").append($("<a></a>").append("&laquo;").attr("href","#")) ;
 			
-			var nextPageLi = $("<li></li>").append($("<a></a>").append("&raquo;")) ;
-			var lastPageLi = $("<li></li>").append($("<a></a>").append("末页")) ;
+			var nextPageLi = $("<li></li>").append($("<a></a>").append("&raquo;").attr("href","#"));
+			var lastPageLi = $("<li></li>").append($("<a></a>").append("末页").attr("href","#"));
 			
-			$("#page_nav_area").append(ul).appendTo("#page_nav_area");
-
+			//在ul中添加首页和上一页提示
+			ul.append(firstPageLi).append(prePageLi);
+			$.each(navNums, function(index, item){				
+				var numLi = $("<li></li>").append($("<a></a>").append(item).attr("href","#"));
+				//在ul中添加页码提示
+				ul.append(numLi);
+			});
+			//在ul中添加下一页和末页提示
+			ul.append(nextPageLi).append(lastPageLi);
+			$("<nav></nav>").append(ul).appendTo("#page_nav_area");			
 		}
 	</script>
 </body>

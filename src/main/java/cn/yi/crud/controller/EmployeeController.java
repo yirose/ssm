@@ -50,12 +50,12 @@ public class EmployeeController {
 		// 引入pageHelper分页插件
 		// 在查询之前只需要调用,传入页码以及每页条数
 
-		PageHelper.startPage(pn, 5);
+		PageHelper.startPage(pn, 10);
 		// startPage后面紧跟的这个查询就是一个分页查询
 		List<Employee> emps = employeeService.getAll();
 		// 使用PageInfo包装查询结果。只需要将PageInfo交给页面就行了
 		// 封装了详细分页信息。包括有查询出来的数据,传入连续显示页数
-		PageInfo page = new PageInfo(emps, 5);
+		PageInfo page = new PageInfo(emps, 10);
 		return Msg.success().add("pageInfo",page);
 	}
 
