@@ -44,13 +44,13 @@ public class EmployeeController {
 	@RequestMapping("/emps")
 	@ResponseBody
 	public Msg getEmpsWithJson(
-			@RequestParam(value = "pn", defaultValue = "1") Integer pn, Model model) {
+			@RequestParam(value = "pn", defaultValue = "1") Integer pn,@RequestParam(value = "nn", defaultValue = "10") Integer nn ) {
 
 		// 这不是分页查询
 		// 引入pageHelper分页插件
 		// 在查询之前只需要调用,传入页码以及每页条数
 
-		PageHelper.startPage(pn, 10);
+		PageHelper.startPage(pn, nn);
 		// startPage后面紧跟的这个查询就是一个分页查询
 		List<Employee> emps = employeeService.getAll();
 		// 使用PageInfo包装查询结果。只需要将PageInfo交给页面就行了

@@ -41,6 +41,7 @@
 		</div>
 		<!-- 显示表格数据-->
 		<div class="row">
+		<div class="col-md-12">
 			<table class="table table-hover table-bordered" id="emps_table">
 				<thead>
 					<tr>
@@ -56,21 +57,46 @@
 				</tbody>
 			</table>
 		</div>
+		</div>
 		<!-- 分页信息-->
 		<div class="row">
 			<!-- 分页文字信息 -->
-			<div class="col-md-5"  id="page_info_area"></div>
+			<div class="col-md-4" id="page_info_area"></div>
 			<!-- 分页条信息 -->
-			<div class="col-md-7 text-center" id="page_nav_area">
+			<div class="col-md-6 text-right" id="page_nav_area"></div>
+			<div class="col-md-2" >
+			<div class="dropdown">
+			  <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+			    Dropdown
+			    <span class="caret"></span>
+			  </button>
+			  <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+			    <li><a href="#">Action</a></li>
+			    <li><a href="#">Another action</a></li>
+			    <li><a href="#">Something else here</a></li>
+			    <li role="separator" class="divider"></li>
+			    <li><a href="#">Separated link</a></li>
+			  </ul>
 			</div>
+			</div>
+			
+			
+
 		</div>
 	</div>
 	<script type="text/javascript">
+	
 		//1、页面加载完成以后，直接去发送一个ajax请求，要到分页数据
-		$(function() {
+		$(function() {			
+			//去首页
+			to_page(1);			
+		});
+		
+		
+		function to_page(pn){
 			$.ajax({
 				url : "${APP_PATH}/emps",
-				data : "pn=1",
+				data : "pn="+pn,
 				type : "GET",
 				success : function(result) {
 					//console.log(result);					
@@ -82,10 +108,11 @@
 					build_page_nav(result);					
 				}
 			});
-		});
+		}
 		
 		//解析员工信息
 		function build_emps_table(result) {	
+			$("#emps_table tbody").empty();
 			var emps = result.extend.pageInfo.list;
 			
 			$.each(emps, function(index, item) {
@@ -94,15 +121,15 @@
 				<span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>修改</button>
 				*/
 				//构建按钮
-				var eidtBnt = $("<button></button>").addClass("btn btn-sm btn-primary")
+				var eidtBnt = $("<button></button>").addClass("btn btn-xs btn-primary")
 				.append($("<span></span>").addClass("glyphicon glyphicon-pencil")).append(" 编辑");
-				var delBnt = $("<button></button>").addClass("btn btn-sm btn-danger")
+				var delBnt = $("<button></button>").addClass("btn btn-xs btn-danger")
 				.append($("<span></span>").addClass("glyphicon glyphicon-trash")).append(" 删除");				
 				
 				//构建表格到#emps_table tbody表格中				
 				var empId = $("<td></td>").append(item.id);
 				var empName = $("<td></td>").append(item.name);
-				var empGender = $("<td></td>").append(item.gender);
+				var empGender = $("<td></td>").append(item.gender=="m"?"男":"女");
 				var empEmail = $("<td></td>").append(item.email);
 				var empDepartment = $("<td></td>").append(item.department.deptName);
 				var empBnt = $("<td></td>").addClass("operationwidth").append(eidtBnt).append(" ").append(delBnt);				
@@ -118,30 +145,70 @@
 		}
 		
 		//解析显示分页信息
-		function build_page_info(result){			
+		function build_page_info(result){
+			$("#page_info_area").empty();
 			var pageInfo = result.extend.pageInfo;
 			$("#page_info_area").append("当前 "+pageInfo.pageNum+" 页, 每页 "+pageInfo.pageSize+" 条数据, 总 "+pageInfo.pages+" 页, 总 "+pageInfo.total+" 条记录");			
 		}
 		
 		//解析分页条信息
 		function build_page_nav(result) {
-			var navNums = result.extend.pageInfo.navigatepageNums;
+			$("#page_nav_area").empty();
+			var pageInfo = result.extend.pageInfo;
+			var navNums = pageInfo.navigatepageNums;
+			var pageNum = pageInfo.pageNum;
+			var pages = pageInfo.pages;
 			
 			//<li><a href="${APP_PATH}/emps?pn=1">首页</a>
 			var ul = $("<ul></ul>").addClass("pagination");
-			var firstPageLi = $("<li></li>").append($("<a></a>").append("首页").attr("href","#")) ;
-			var prePageLi = $("<li></li>").append($("<a></a>").append("&laquo;").attr("href","#")) ;
+			var firstPageLi = $("<li></li>").append($("<a></a>").append("首页"));	
+			var prePageLi = $("<li></li>").append($("<a></a>").append("&laquo;"));			
 			
-			var nextPageLi = $("<li></li>").append($("<a></a>").append("&raquo;").attr("href","#"));
-			var lastPageLi = $("<li></li>").append($("<a></a>").append("末页").attr("href","#"));
-			
+			//判断是否第一页	
+			if(pageInfo.hasPreviousPage == false){
+				firstPageLi.addClass("disabled");
+				prePageLi.addClass("disabled");
+			}else{
+				firstPageLi.click(function(){
+					to_page(1);					
+				});
+				prePageLi.click(function(){
+					to_page(pageNum - 1);					
+				});				
+			}
 			//在ul中添加首页和上一页提示
 			ul.append(firstPageLi).append(prePageLi);
-			$.each(navNums, function(index, item){				
-				var numLi = $("<li></li>").append($("<a></a>").append(item).attr("href","#"));
+			
+			// 分页遍历
+			$.each(navNums, function(index, item){
+				var numLi = $("<li></li>").append($("<a></a>").append(item));
+				if(pageNum == item){
+					numLi.addClass("active");					
+				}else{
+					numLi.click(function(){
+						to_page(item);					
+					});
+				}								
 				//在ul中添加页码提示
 				ul.append(numLi);
 			});
+			
+			var nextPageLi = $("<li></li>").append($("<a></a>").append("&raquo;"));			
+			var lastPageLi = $("<li></li>").append($("<a></a>").append("末页"));
+			
+			//判断是否最后一页
+			if(pageInfo.hasNextPage == false){
+				nextPageLi.addClass("disabled");
+				lastPageLi.addClass("disabled");
+			}else{
+				nextPageLi.click(function(){
+					to_page(pageNum + 1);					
+				});
+				lastPageLi.click(function(){
+					to_page(pages);					
+				});
+			}
+			
 			//在ul中添加下一页和末页提示
 			ul.append(nextPageLi).append(lastPageLi);
 			$("<nav></nav>").append(ul).appendTo("#page_nav_area");			
