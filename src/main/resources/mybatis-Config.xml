@@ -5,13 +5,16 @@
 
 <configuration>
 	<settings>
-	<!-- 驼峰面命规则 -->
+		<!-- 驼峰面命规则 -->
 		<setting name="mapUnderscoreToCamelCase" value="true" />
 	</settings>
 	<typeAliases>
 		<package name="cn.yi.crud.bean" />
 	</typeAliases>
 	<plugins>
-	<plugin interceptor="com.github.pagehelper.PageInterceptor"></plugin>
+		<plugin interceptor="com.github.pagehelper.PageInterceptor">
+			<!-- 分页合理化参数 -->
+			<property name="reasonable" value="true" />
+		</plugin>
 	</plugins>
 </configuration>

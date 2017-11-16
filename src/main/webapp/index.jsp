@@ -8,7 +8,12 @@
 <%
 	pageContext.setAttribute("APP_PATH", request.getContextPath());
 %>
-<!-- Bootstrap -->
+<style type="text/css">
+.operationwidth {
+	width: 20%;
+	text-align: center;
+}
+</style>
 <link href="${APP_PATH}/staic/css/bootstrap.min.css" rel="stylesheet">
 <script src="${APP_PATH}/staic/js/bootstrap.min.js"></script>
 <script src="${APP_PATH}/staic/js/jquery.min.js"></script>
@@ -54,20 +59,9 @@
 		<!-- 分页信息-->
 		<div class="row">
 			<!-- 分页文字信息 -->
-			<div class="col-md-5">当前 页, 每页 条数据, 总 页, 总 条记录</div>
+			<div class="col-md-5"  id="page_info_area"></div>
 			<!-- 分页条信息 -->
-			<div class="col-md-7 text-center">
-				<nav aria-label="Page navigation">
-				<ul class="pagination">
-					<li><a href="#">首页</a></li>
-					<li><a href="#" aria-label="Previous"> <span
-							aria-hidden="true">&laquo;</span></a></li>
-					<li class="active"><a href="#">1</a></li>
-					<li><a href="#" aria-label="Next"> <span
-							aria-hidden="true">&raquo;</span></a></li>
-					<li><a href="#">末页</a></li>
-				</ul>
-				</nav>
+			<div class="col-md-7 text-center" id="page_nav_area">
 			</div>
 		</div>
 	</div>
@@ -80,13 +74,21 @@
 				type : "GET",
 				success : function(result) {
 					//console.log(result);
+					
 					//1、解析并显示员工数据
 					build_emps_table(result);
+					
+					//2、解析并显示员工数据
+					build_page_info(result);
 
-					//2、解析并显示分页信息
+					//3、解析并显示分页信息
+					build_page_nav(result);
+					
 				}
 			});
 		});
+		
+		//解析员工信息
 		function build_emps_table(result) {
 			var emps = result.extend.pageInfo.list;
 			
@@ -107,7 +109,7 @@
 				var empGender = $("<td></td>").append(item.gender);
 				var empEmail = $("<td></td>").append(item.email);
 				var empDepartment = $("<td></td>").append(item.department.deptName);
-				var empBnt = $("<td></td>").append(eidtBnt).append(" ").append(delBnt);				
+				var empBnt = $("<td></td>").addClass("operationwidth").append(eidtBnt).append(" ").append(delBnt);				
 				
 				
 				$("<tr></tr>").append(empId)
@@ -119,8 +121,25 @@
 				.appendTo("#emps_table tbody");				
 			})
 		}
-
+		
+		//解析显示分页信息
+		function build_page_info(result){			
+			var pageInfo =result.extend.pageInfo;			
+			$("#page_info_area").append("当前 "+pageInfo.pageNum+" 页, 每页 "+pageInfo.pageSize+" 条数据, 总 "+pageInfo.pages+" 页, 总 "+pageInfo.total+" 条记录");			
+		}
+		
+		//解析分页条信息
 		function build_page_nav(result) {
+			
+			var ul = $("<ul ></ul >").appClass("pagination");
+			//<li><a href="${APP_PATH}/emps?pn=1">首页</a>
+			var firstPageLi = $("<li></li>").append($("<a></a>").append("首页")) ;
+			var prePageLi = $("<li></li>").append($("<a></a>").append("&laquo;")) ;
+			
+			var nextPageLi = $("<li></li>").append($("<a></a>").append("&raquo;")) ;
+			var lastPageLi = $("<li></li>").append($("<a></a>").append("末页")) ;
+			
+			$("#page_nav_area").append(ul).appendTo("#page_nav_area");
 
 		}
 	</script>
