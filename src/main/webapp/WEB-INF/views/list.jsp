@@ -11,8 +11,8 @@
 %>
 <!-- Bootstrap -->
 <link href="${APP_PATH}/staic/css/bootstrap.min.css" rel="stylesheet">
-<script src="${APP_PATH}/staic/js/bootstrap.min.js"></script>
-<script src="${APP_PATH}/staic/js/jquery.min.js"></script>
+<script src="${APP_PATH}/staic/js/libs/bootstrap.min.js"></script>
+<script src="${APP_PATH}/staic/js/libs/jquery.min.js"></script>
 </head>
 <body>
 	<div class="container">

@@ -16,8 +16,8 @@
 	#page_nav_area nav {float: right !important;}
 </style>
 <link href="${APP_PATH}/staic/css/bootstrap.min.css" rel="stylesheet">
-<script src="${APP_PATH}/staic/js/bootstrap.min.js"></script>
-<script src="${APP_PATH}/staic/js/jquery.min.js"></script>
+<script src="${APP_PATH}/staic/js/libs/bootstrap.min.js"></script>
+<script src="${APP_PATH}/staic/js/libs/jquery-3.2.1.min.js"></script>
 </head>
 <body>
 	<div class="container">
@@ -74,13 +74,10 @@
 		//1、页面加载完成以后，直接去发送一个ajax请求，要到分页数据
 		$(function() {			
 			//去首页
-			to_page(1);			
+			to_page(1,10);			
 		});
 		
-		function to_page(pn ,nn){
-			if(nn == null){
-				var nn = 10; 
-			}			
+		function to_page(pn ,nn){		
 			$.ajax({
 				url : "${APP_PATH}/emps",
 				data :"pn="+pn+"&nn=" + nn ,
@@ -140,6 +137,7 @@
 		
 		//解析分页条信息
 		function build_page_nav(result,nn) {
+			alert(nn);
 			$("#page_nav_area").empty();			
 			var pageInfo = result.extend.pageInfo;
 			var navNums = pageInfo.navigatepageNums;
@@ -203,24 +201,23 @@
 			var v20 = $("<option></option>").append(20);
 			var v40 = $("<option></option>").append(40);
 			var v80 = $("<option></option>").append(80);		
+	
+				v10.click(function(){
+					to_page(pageNum ,10);					
+				});				
 			
-			v10.click(function(){
+				v20.click(function(){
+					to_page(pageNum ,20);
+				});
 				
-				to_page(pageNum);					
-			});
-			v20.click(function(){				
-				nn = 20;
-				to_page(pageNum,nn);
-			});
-			v40.click(function(){
-				nn = 40;
-				to_page(pageNum,nn);					
-			});
-			v80.click(function(){
-				nn = 80;
-				to_page(pageNum,nn);					
-			});	
-			
+				v40.click(function(){
+					to_page(pageNum ,40);					
+				});
+				
+				v80.bind("change",function(){
+					to_page(pageNum ,80);					
+				});	
+
 			var vsel = $("<nav></nav>").append($("<select></select>").addClass("btn btn-default dropdown-toggle page_nav_lh").append(v0).append(v10).append(v20).append(v40).append(v80));
 			var nav = $("<nav></nav>").append(ul);			
 			$("#page_nav_area").append(vsel).append(nav);				
