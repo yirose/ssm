@@ -9,10 +9,10 @@
 	pageContext.setAttribute("APP_PATH", request.getContextPath());
 %>
 <style type="text/css">
-.operationwidth {
-	width: 20%;
-	text-align: center;
-}
+	.operationwidth {width: 20%;text-align: center;}
+	.page_info_lh{ margin: 20px 0 0 0;}
+	.page_nav_lh{ margin: 10px 0  10px 15px!important;}
+	#page_nav_area nav {float: left!important;}
 </style>
 <link href="${APP_PATH}/staic/css/bootstrap.min.css" rel="stylesheet">
 <script src="${APP_PATH}/staic/js/bootstrap.min.js"></script>
@@ -61,26 +61,10 @@
 		<!-- 分页信息-->
 		<div class="row">
 			<!-- 分页文字信息 -->
-			<div class="col-md-4" id="page_info_area"></div>
+			<div class="col-md-5 page_info_lh" id="page_info_area"></div>
 			<!-- 分页条信息 -->
-			<div class="col-md-6 text-right" id="page_nav_area"></div>
-			<div class="col-md-2" >
-			<div class="dropdown">
-			  <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-			    Dropdown
-			    <span class="caret"></span>
-			  </button>
-			  <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-			    <li><a href="#">Action</a></li>
-			    <li><a href="#">Another action</a></li>
-			    <li><a href="#">Something else here</a></li>
-			    <li role="separator" class="divider"></li>
-			    <li><a href="#">Separated link</a></li>
-			  </ul>
-			</div>
-			</div>
-			
-			
+			<div class="col-md-7 text-center" id="page_nav_area"></div>
+
 
 		</div>
 	</div>
@@ -92,11 +76,13 @@
 			to_page(1);			
 		});
 		
-		
-		function to_page(pn){
+		function to_page(pn ,nn){
+			if(nn == null){
+				var nn = 10; 
+			}			
 			$.ajax({
 				url : "${APP_PATH}/emps",
-				data : "pn="+pn,
+				data :"pn="+pn+"&nn=" + nn ,
 				type : "GET",
 				success : function(result) {
 					//console.log(result);					
@@ -105,7 +91,7 @@
 					//2、解析并显示员工数据
 					build_page_info(result);
 					//3、解析并显示分页信息
-					build_page_nav(result);					
+					build_page_nav(result,nn);					
 				}
 			});
 		}
@@ -152,15 +138,15 @@
 		}
 		
 		//解析分页条信息
-		function build_page_nav(result) {
-			$("#page_nav_area").empty();
+		function build_page_nav(result,nn) {
+			$("#page_nav_area").empty();			
 			var pageInfo = result.extend.pageInfo;
 			var navNums = pageInfo.navigatepageNums;
 			var pageNum = pageInfo.pageNum;
 			var pages = pageInfo.pages;
 			
 			//<li><a href="${APP_PATH}/emps?pn=1">首页</a>
-			var ul = $("<ul></ul>").addClass("pagination");
+			var ul = $("<ul></ul>").addClass("pagination page_nav_lh");
 			var firstPageLi = $("<li></li>").append($("<a></a>").append("首页"));	
 			var prePageLi = $("<li></li>").append($("<a></a>").append("&laquo;"));			
 			
@@ -170,10 +156,10 @@
 				prePageLi.addClass("disabled");
 			}else{
 				firstPageLi.click(function(){
-					to_page(1);					
+					to_page(1,nn);					
 				});
 				prePageLi.click(function(){
-					to_page(pageNum - 1);					
+					to_page(pageNum - 1,nn);					
 				});				
 			}
 			//在ul中添加首页和上一页提示
@@ -186,7 +172,7 @@
 					numLi.addClass("active");					
 				}else{
 					numLi.click(function(){
-						to_page(item);					
+						to_page(item,nn);					
 					});
 				}								
 				//在ul中添加页码提示
@@ -202,16 +188,41 @@
 				lastPageLi.addClass("disabled");
 			}else{
 				nextPageLi.click(function(){
-					to_page(pageNum + 1);					
+					to_page(pageNum + 1,nn);					
 				});
 				lastPageLi.click(function(){
-					to_page(pages);					
+					to_page(pages,nn);					
 				});
 			}
 			
 			//在ul中添加下一页和末页提示
-			ul.append(nextPageLi).append(lastPageLi);
-			$("<nav></nav>").append(ul).appendTo("#page_nav_area");			
+			ul.append(nextPageLi).append(lastPageLi);			
+			var v10 = $("<option></option>").append("10");
+			var v20 = $("<option></option>").append("20");
+			var v40 = $("<option></option>").append("40");
+			var v80 = $("<option></option>").append("80");		
+			
+			v10.click(function(){
+				
+				to_page(pageNum);					
+			});
+			v20.click(function(){
+				nn = 20;
+				to_page(pageNum,nn);					
+			});
+			v40.click(function(){
+				nn = 40;
+				to_page(pageNum,nn);					
+			});
+			v80.click(function(){
+				nn = 80;
+				to_page(pageNum,nn);					
+			});			
+			
+			var vsel = $("<select></select>").addClass("btn btn-default dropdown-toggle page_nav_lh").append(v10).append(v20).append(v40).append(v80);			
+			var sel = $("<nav></nav>").append(vsel);
+			var nav = $("<nav></nav>").append(ul);			
+			$("#page_nav_area").append(nav).append("&nbsp;&nbsp;&nbsp;").append(sel);				
 		}
 	</script>
 </body>
