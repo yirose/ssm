@@ -9,10 +9,11 @@
 	pageContext.setAttribute("APP_PATH", request.getContextPath());
 %>
 <style type="text/css">
-	.operationwidth {width: 20%;text-align: center;}
+	.operationwidth {width: 20%; text-align: center;}
 	.page_info_lh{ margin: 20px 0 0 0;}
 	.page_nav_lh{ margin: 10px 0  10px 15px!important;}
-	#page_nav_area nav {float: left!important;}
+	.option1{ background:#337ab7; color: aliceblue;}
+	#page_nav_area nav {float: right !important;}
 </style>
 <link href="${APP_PATH}/staic/css/bootstrap.min.css" rel="stylesheet">
 <script src="${APP_PATH}/staic/js/bootstrap.min.js"></script>
@@ -63,7 +64,7 @@
 			<!-- 分页文字信息 -->
 			<div class="col-md-5 page_info_lh" id="page_info_area"></div>
 			<!-- 分页条信息 -->
-			<div class="col-md-7 text-center" id="page_nav_area"></div>
+			<div class="col-md-7" id="page_nav_area"></div>
 
 
 		</div>
@@ -197,18 +198,19 @@
 			
 			//在ul中添加下一页和末页提示
 			ul.append(nextPageLi).append(lastPageLi);			
-			var v10 = $("<option></option>").append("10");
-			var v20 = $("<option></option>").append("20");
-			var v40 = $("<option></option>").append("40");
-			var v80 = $("<option></option>").append("80");		
+			var v0 = $("<option></option>").addClass("option1").append(nn);
+			var v10 = $("<option></option>").append(10);
+			var v20 = $("<option></option>").append(20);
+			var v40 = $("<option></option>").append(40);
+			var v80 = $("<option></option>").append(80);		
 			
 			v10.click(function(){
 				
 				to_page(pageNum);					
 			});
-			v20.click(function(){
+			v20.click(function(){				
 				nn = 20;
-				to_page(pageNum,nn);					
+				to_page(pageNum,nn);
 			});
 			v40.click(function(){
 				nn = 40;
@@ -217,12 +219,11 @@
 			v80.click(function(){
 				nn = 80;
 				to_page(pageNum,nn);					
-			});			
+			});	
 			
-			var vsel = $("<select></select>").addClass("btn btn-default dropdown-toggle page_nav_lh").append(v10).append(v20).append(v40).append(v80);			
-			var sel = $("<nav></nav>").append(vsel);
+			var vsel = $("<nav></nav>").append($("<select></select>").addClass("btn btn-default dropdown-toggle page_nav_lh").append(v0).append(v10).append(v20).append(v40).append(v80));
 			var nav = $("<nav></nav>").append(ul);			
-			$("#page_nav_area").append(nav).append("&nbsp;&nbsp;&nbsp;").append(sel);				
+			$("#page_nav_area").append(vsel).append(nav);				
 		}
 	</script>
 </body>
