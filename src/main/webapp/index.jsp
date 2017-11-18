@@ -37,12 +37,45 @@
 	        <h4 class="modal-title" id="myModalLabel">员工信息添加</h4>
 	      </div>
 	      <div class="modal-body">
-	        ...
+	        <form class="form-horizontal">
+			  <div class="form-group">
+			    <label for="inputEmpName" class="col-sm-2 control-label">姓 名</label>
+			    <div class="col-sm-10">
+			      <input type="name" name="name" class="form-control" id="inputAddName" placeholder="name">
+			    </div>
+			  </div>
+			  <div class="form-group">
+			    <label for="inputEmpEmail" class="col-sm-2 control-label">邮 箱</label>
+			    <div class="col-sm-10">
+			      <input type="email" name="email" class="form-control" id="inputAddEmail" placeholder="email@yi.cn">
+			    </div>
+			  </div>
+			  <div class="form-group">
+			    <label for="inputEmpGender" class="col-sm-2 control-label">性 别</label>
+			    <div class="col-sm-10">
+				    <label class="radio-inline">
+						<input type="radio" name="gender" id="inlineAddGender1" value="m"> 男
+					</label>
+					<label class="radio-inline">
+						<input type="radio" name="gender" id="inlineAddGender2" value="f"> 女
+					</label>
+			    </div>
+			  </div>
+			  <div class="form-group">
+			    <label for="inputEmpDeptName" class="col-sm-2 control-label">部 门</label>
+			    <div class="col-sm-4">
+			    <!-- 提交部门id查询 -->
+					<select class="form-control" name="dId">
+					 
+					</select>
+			    </div>
+			  </div> 
 	      </div>
 	      <div class="modal-footer">
 	        <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">关闭</button>
 	        <button type="button" class="btn btn-sm btn-primary">保存</button>
 	      </div>
+	      </form>
 	    </div>
 	  </div>
 	</div>
@@ -254,10 +287,25 @@
 		
 		//打开模态框
 		$("#empAddModalBnt").click(function(){
+			//1: 发送ajax请求，查出部门信息，显示在下拉列表中
+			getDepts();
+			
+			//2：弹出模态框
 			$('#empAddModal').modal({
 				backdrop:"static"
 			});
 		});
+		
+		//发送ajax请求，查出部门信息，显示在下拉列表中
+		function getDepts(){
+			$.ajax({
+				url:"${APP_PATH}/depts",
+				type:"GET",
+				success:function(result){
+					console.log(result)
+				}				
+			});			
+		}
 	</script>
 </body>
 </html>
