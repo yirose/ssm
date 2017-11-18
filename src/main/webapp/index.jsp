@@ -10,16 +10,43 @@
 %>
 <style type="text/css">
 	.operationwidth {width: 20%; text-align: center;}
-	.page_info_lh{ margin: 20px 0 0 0;}
-	.page_nav_lh{ margin: 10px 0  10px 15px!important;}
+	.page_info_lh{ margin: 23px 0 0 0;}
 	.option1{ background:#337ab7; color: aliceblue;}
 	#page_nav_area nav {float: right !important;}
+	#page_nav_area nav .page_nav_lh{margin:15px 0;}
+	#page_nav_area .btn-group { float: right;margin:15px 0 10px 10px;}
+	#page_nav_area .btn-dropdown{padding: 14px 5px !important;}
+	#page_nav_area .dropdown-menu {min-width:60px !important;}
+	#page_nav_area .dropdown-menu li {min-width:60px;text-align:center;line-height:25px;}
+	#page_nav_area .dropdown-menu .divider {margin:1px 0!important;}
+	#page_nav_area .dropdown-menu li a{padding:3px 17px!important;}
 </style>
 <link href="${APP_PATH}/staic/css/bootstrap.min.css" rel="stylesheet">
-<script src="${APP_PATH}/staic/js/libs/bootstrap.min.js"></script>
 <script src="${APP_PATH}/staic/js/libs/jquery-3.2.1.min.js"></script>
+<!-- bootstrap.min.js使用要放在jquery后面 -->
+<script src="${APP_PATH}/staic/js/libs/bootstrap.min.js"></script>
 </head>
 <body>
+
+	<!-- 员工添加模态框 -->
+	<div class="modal fade" id="empAddModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+	  <div class="modal-dialog" role="document">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+	        <h4 class="modal-title" id="myModalLabel">员工信息添加</h4>
+	      </div>
+	      <div class="modal-body">
+	        ...
+	      </div>
+	      <div class="modal-footer">
+	        <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">关闭</button>
+	        <button type="button" class="btn btn-sm btn-primary">保存</button>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+
 	<div class="container">
 		<!-- 标题栏 -->
 		<div class="row">
@@ -29,15 +56,11 @@
 		</div>
 		<!-- 按钮 -->
 		<div class="row">
-			<div class="col-md-2 col-md-offset-10 class="text-center"">
-				<button type="button" class="btn btn-sm btn-primary">
-					<span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
-					修改
-				</button>
+			<div class="col-md-2 col-md-offset-10 class="text-center"">				
+				<button type="button" class="btn btn-sm btn-primary" id="empAddModalBnt">
+					<span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>新增</button>
 				<button type="button" class="btn btn-sm btn-danger">
-					<span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
-					删除
-				</button>
+					<span class="glyphicon glyphicon-trash" aria-hidden="true"></span>删除</button>
 			</div>
 		</div>
 		<!-- 显示表格数据-->
@@ -65,8 +88,6 @@
 			<div class="col-md-5 page_info_lh" id="page_info_area"></div>
 			<!-- 分页条信息 -->
 			<div class="col-md-7" id="page_nav_area"></div>
-
-
 		</div>
 	</div>
 	<script type="text/javascript">
@@ -97,15 +118,14 @@
 		//解析员工信息
 		function build_emps_table(result) {	
 			$("#emps_table tbody").empty();
-			var emps = result.extend.pageInfo.list;
-			
+			var emps = result.extend.pageInfo.list;			
 			$.each(emps, function(index, item) {
 				/*
 				<button type="button" class="btn btn-sm btn-primary">
 				<span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>修改</button>
 				*/
 				//构建按钮
-				var eidtBnt = $("<button></button>").addClass("btn btn-xs btn-primary")
+				var eidtBnt = $("<button></button>").addClass("btn btn-xs btn-info")
 				.append($("<span></span>").addClass("glyphicon glyphicon-pencil")).append(" 编辑");
 				var delBnt = $("<button></button>").addClass("btn btn-xs btn-danger")
 				.append($("<span></span>").addClass("glyphicon glyphicon-trash")).append(" 删除");				
@@ -137,7 +157,7 @@
 		
 		//解析分页条信息
 		function build_page_nav(result,nn) {
-			alert(nn);
+
 			$("#page_nav_area").empty();			
 			var pageInfo = result.extend.pageInfo;
 			var navNums = pageInfo.navigatepageNums;
@@ -195,33 +215,49 @@
 			}
 			
 			//在ul中添加下一页和末页提示
-			ul.append(nextPageLi).append(lastPageLi);			
-			var v0 = $("<option></option>").addClass("option1").append(nn);
-			var v10 = $("<option></option>").append(10);
-			var v20 = $("<option></option>").append(20);
-			var v40 = $("<option></option>").append(40);
-			var v80 = $("<option></option>").append(80);		
-	
-				v10.click(function(){
-					to_page(pageNum ,10);					
-				});				
+			ul.append(nextPageLi).append(lastPageLi);
 			
-				v20.click(function(){
-					to_page(pageNum ,20);
+			//下拉菜单
+			var btnG01 =$("<button></button>").addClass("btn btn-default").append(nn);
+			var btnG02 =$("<button></button>").addClass("btn btn-default btn-dropdown").append($("<span></span>").addClass("caret").append($("<span></span>")));
+			
+			var nLi1 = $("<li></li>").append($("<a></a>").append(10));
+			var nLi2 = $("<li></li>").append($("<a></a>").append(20));
+			var nLi3 = $("<li></li>").append($("<a></a>").append(40));
+			var nLi4 = $("<li></li>").append($("<a></a>").append(80));
+			var nLi5 = $("<li></li>").append($("<a></a>").append(160));			
+			var groupUl = $("<ul></ul>").addClass("dropdown-menu").append(nLi1).append(nLi2).append(nLi3).append(nLi4).append(nLi5);
+			var btn_group = $("<div></div>").addClass("btn-group").append(btnG01).append(btnG02).append(groupUl);
+	
+			nLi1.click(function(){
+				to_page(pageNum ,10);					
 				});
-				
-				v40.click(function(){
-					to_page(pageNum ,40);					
-				});
-				
-				v80.bind("change",function(){
-					to_page(pageNum ,80);					
-				});	
-
-			var vsel = $("<nav></nav>").append($("<select></select>").addClass("btn btn-default dropdown-toggle page_nav_lh").append(v0).append(v10).append(v20).append(v40).append(v80));
+			nLi2.click(function(){
+				to_page(pageNum ,20);					
+			});
+			nLi3.click(function(){
+				to_page(pageNum ,40);					
+			});
+			nLi4.click(function(){
+				to_page(pageNum ,80);					
+			});
+			nLi5.click(function(){
+				to_page(pageNum ,160);					
+			});
+						
+			btnG02.click(function(){
+				$(groupUl).toggle(true);
+				});			
 			var nav = $("<nav></nav>").append(ul);			
-			$("#page_nav_area").append(vsel).append(nav);				
+			$("#page_nav_area").append(btn_group).append(nav);
 		}
+		
+		//打开模态框
+		$("#empAddModalBnt").click(function(){
+			$('#empAddModal').modal({
+				backdrop:"static"
+			});
+		});
 	</script>
 </body>
 </html>
