@@ -7,6 +7,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -32,7 +33,18 @@ public class EmployeeController {
 
 	@Autowired
 	EmployeeService employeeService;
-
+	
+	/**
+	 * 员工保存
+	 * @return
+	 */
+	@RequestMapping(value="/emp",method=RequestMethod.POST)
+	@ResponseBody
+	public Msg saveEmp(Employee employee){
+		employeeService.saveEmp(employee);
+		return Msg.success();		
+	}
+	
 	/**
 	 * JSON方式查询员工数据(分页查询)
 	 * 导入jackson包@RequestBody才能工作
@@ -41,6 +53,7 @@ public class EmployeeController {
 	 * @return
 	 */
 
+	
 	@RequestMapping("/emps")
 	@ResponseBody
 	public Msg getEmpsWithJson(
@@ -55,7 +68,7 @@ public class EmployeeController {
 		List<Employee> emps = employeeService.getAll();
 		// 使用PageInfo包装查询结果。只需要将PageInfo交给页面就行了
 		// 封装了详细分页信息。包括有查询出来的数据,传入连续显示页数
-		PageInfo page = new PageInfo(emps, 10);
+		PageInfo page = new PageInfo(emps, 7);
 		return Msg.success().add("pageInfo",page);
 	}
 

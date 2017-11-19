@@ -63,19 +63,17 @@
 			  </div>
 			  <div class="form-group">
 			    <label for="inputEmpDeptName" class="col-sm-2 control-label">部 门</label>
-			    <div class="col-sm-4">
+			    <div class="col-sm-3">
 			    <!-- 提交部门id查询 -->
-					<select class="form-control" name="dId">
-					 
-					</select>
+					<select class="form-control" name="dId"></select>
 			    </div>
 			  </div> 
+			  </form>
 	      </div>
 	      <div class="modal-footer">
 	        <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">关闭</button>
-	        <button type="button" class="btn btn-sm btn-primary">保存</button>
-	      </div>
-	      </form>
+	        <button type="button" class="btn btn-sm btn-primary" id="empSaveBnt">保存</button>
+	      </div>	      
 	    </div>
 	  </div>
 	</div>
@@ -302,9 +300,35 @@
 				url:"${APP_PATH}/depts",
 				type:"GET",
 				success:function(result){
-					console.log(result)
+					//显示部门信息在下拉列表中
+					//两种写法 一种传参 一种部传参	
+					/* $.each( result.extend.depts, function(index, item) {						
+						$("<option></option>").val(item.deptId).append(item.deptName).appendTo("#empAddModal select");
+					});	 */
+					
+					$.each( result.extend.depts, function() {
+						$("<option></option>").val(this.deptId).append(this.deptName).appendTo("#empAddModal select");
+					});	
 				}				
-			});			
+			});	
+			
+			$("#empSaveBnt").click(function(){
+				//1、将模态框中填写的表单数据提交给服务器进行保存
+				//2、发送ajax请求保存员工
+				 $.ajax({
+					url:"${APP_PATH}/emp",
+					type:"POST",
+					//jquery serialize() 序列表表格内容为字符串。
+					data:$("#empAddModal form").serialize(),
+					success:function(result){
+						//alert(result.msg);	
+						//关闭模态框
+						$('#empAddModal').modal('hide');
+						//来到最后一页，显示刚才保存数据。
+						to_page(9999,10);
+					}								
+				}); 				
+			});
 		}
 	</script>
 </body>
