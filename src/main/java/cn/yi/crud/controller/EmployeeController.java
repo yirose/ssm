@@ -5,7 +5,6 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -34,6 +33,12 @@ public class EmployeeController {
 	@Autowired
 	EmployeeService employeeService;
 	
+	@RequestMapping("/checkname")
+	@ResponseBody
+	public Msg checkEmpName(String name){
+		boolean  b = employeeService.checkEmpName(name);
+		return null;
+	}
 	/**
 	 * 员工保存
 	 * @return
@@ -95,7 +100,6 @@ public class EmployeeController {
 		// 封装了详细分页信息。包括有查询出来的数据,传入连续显示页数
 		PageInfo page = new PageInfo(emps, 10);
 		model.addAttribute("pageInfo", page);
-
 		return "list";
 	}
 

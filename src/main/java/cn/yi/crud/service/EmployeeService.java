@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import cn.yi.crud.bean.Employee;
+import cn.yi.crud.bean.EmployeeExample;
+import cn.yi.crud.bean.EmployeeExample.Criteria;
 import cn.yi.crud.dao.EmployeeMapper;
 
 @Service
@@ -29,5 +31,19 @@ public class EmployeeService {
 	 */
 	public void saveEmp(Employee employee) {
 		employeeMapper.insertSelective(employee);		
+	}
+
+	
+	/**
+	 * 检验员工姓名属否登记
+	 * @param name
+	 * @return
+	 */
+	public boolean checkEmpName(String name) {
+		EmployeeExample example = new EmployeeExample();
+		Criteria criteria= example.createCriteria();
+		criteria.andNameEqualTo(name);
+		long count = employeeMapper.countByExample(example);
+		return count == 0 ;
 	}
 }
