@@ -321,24 +321,39 @@
 		
 		// 校验name email表单数据		
 		//用户名验证		
-		$("#inputAddName").change(function() {
+		$("#inputAddName").focusout(function() {
 		  	var name = $("#inputAddName").val();
 			 // 1: 拿到要校验的数据，使用正则表达式
 			var regName = /(^[a-zA-Z0-9_-]{6,16}$)|(^[\u2E80-\u9FFF]{2,5}$)/;
 			if(regName.test(name)){
 				showValifataMsg("#inputAddName","success","用户名正确！");
-				addName =true;
+				addName =true;				
 			}else{
 				showValifataMsg("#inputAddName","error","用户名是2-5位中文或6-16位英文和数字的组合！");
 				addName =false;
-			}
+			}			
+			$.ajax({
+				url: "${APP_PATH}/checkname",
+				data: "name=" + name,
+				type: "POST",
+				success: function (result) {
+					if(result.code == 100){
+						alert("ok");
+					}else{
+						alert("err");
+					}
+				}				
+			});
+			
+			
 		});
 		//邮箱验证
-		$("#inputAddEmail").change(function() {
+		$("#inputAddEmail").focusout(function() {
 			var name = $("#inputAddEmail").val();
 			var regName = /^[a-z\d]+(\.[a-z\d]+)*@([\da-z](-[\da-z])?)+(\.{1,2}[a-z]+)+$/;
 			if(regName.test(name)){
 				showValifataMsg("#inputAddEmail","success","邮箱正确！");
+				
 				addEmail =true;
 			}else{
 				showValifataMsg("#inputAddEmail","error","邮箱错误，请输入正确邮箱！");
@@ -369,6 +384,13 @@
 				$(ele).next("span").text(msg);
 			}			
 		}
+		
+		//抽取ajax校验name email
+		function showAjax(){
+			
+		}
+		
+		
 
 		// 保存员工的方法
 		$("#empSaveBnt").click(function () {

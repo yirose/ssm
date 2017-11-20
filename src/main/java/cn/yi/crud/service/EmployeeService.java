@@ -35,9 +35,9 @@ public class EmployeeService {
 
 	
 	/**
-	 * 检验员工姓名属否登记
+	 * 检验员工姓名是否登记
 	 * @param name
-	 * @return
+	 * @return   count==0 就是 true 否则就是false
 	 */
 	public boolean checkEmpName(String name) {
 		EmployeeExample example = new EmployeeExample();
