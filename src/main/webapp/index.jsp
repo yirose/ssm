@@ -290,7 +290,7 @@
 	}
 
 	// 打开模态框
-	$("#empAddModalBnt").click(function () {
+	$("#empAddModalBnt").unbind('click').click(function () {
 		// 1: 发送ajax请求，查出部门信息，显示在下拉列表中
 		getDepts();
 
@@ -301,27 +301,28 @@
 	});
 
 	// 发送ajax请求，查出部门信息，显示在下拉列表中
-	function getDepts() {
+	function getDepts() {	
+		$("#empAddModal select") .empty();
 		$.ajax({
 			url: "${APP_PATH}/depts",
 			type: "GET",
 			success: function (result) {
 				// 显示部门信息在下拉列表中
 				// 两种写法 一种传参 一种部传参
-				/*$.each( result.extend.depts, function(index, item) { $("<option></option>").val(item.deptId).append(item.deptName).appendTo("#empAddModal
-				 * select"); });
-				 */
-
-				$.each(result.extend.depts, function () {
+				$.each( result.extend.depts, function(index, item){ 
+					$("<option></option>").val(item.deptId)
+					.append(item.deptName).appendTo("#empAddModal select"); 
+				}); 				 
+				/* $.each(result.extend.depts, function () {
 					$("<option></option>").val(this.deptId).append(this.deptName)
 						.appendTo("#empAddModal select");
-				});
+				}); */
 			}
 		});
 		
 		// 校验name email表单数据		
 		//用户名验证		
-		$("#inputAddName").focusout(function() {
+		$("#inputAddName").off().focusout(function() {
 		  	var name = $("#inputAddName").val();		  
 			 // 1: 拿到要校验的数据，使用正则表达式			 
 			var regName = /(^[a-zA-Z0-9_-]{6,16}$)|(^[\u2E80-\u9FFF]{2,5}$)/;
@@ -346,7 +347,7 @@
 			}			
 		});
 		//邮箱验证
-		$("#inputAddEmail").focusout(function() {
+		$("#inputAddEmail").off().focusout(function() {
 			var name = $("#inputAddEmail").val();
 			var regName = /^[a-z\d]+(\.[a-z\d]+)*@([\da-z](-[\da-z])?)+(\.{1,2}[a-z]+)+$/;
 			if(regName.test(name)){
