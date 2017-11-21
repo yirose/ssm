@@ -195,7 +195,7 @@
 		var navNums = pageInfo.navigatepageNums;
 		var pageNum = pageInfo.pageNum;
 		var pages = pageInfo.pages;
-		totalRecord = pages;
+		totalRecord = pageInfo.total;
 		// <li><a href="${APP_PATH}/emps?pn=1">首页</a>
 		var ul = $("<ul></ul>").addClass("pagination page_nav_lh");
 		var firstPageLi = $("<li></li>").append($("<a></a>").append("首页"));
@@ -322,29 +322,32 @@
 		// 校验name email表单数据		
 		//用户名验证		
 		$("#inputAddName").focusout(function() {
-		  	var name = $("#inputAddName").val();
+		  	var name = $("#inputAddName").val();		  	
+		  
 			 // 1: 拿到要校验的数据，使用正则表达式
+			 
 			var regName = /(^[a-zA-Z0-9_-]{6,16}$)|(^[\u2E80-\u9FFF]{2,5}$)/;
 			if(regName.test(name)){
-				showValifataMsg("#inputAddName","success","用户名正确！");
-				addName =true;				
+				$.ajax({
+					url: "${APP_PATH}/checkname",
+					data: "name=" + name,
+					type: "POST",
+					success: function (result) {
+						if(result.code == 100){
+							showValifataMsg("#inputAddName","success","用户名正确！");
+							addName =true;
+						}else{
+							$("#inputAddName").parent().removeClass("has-success")
+							$("#inputAddName").parent().addClass("has-error");				
+							$("#inputAddName").next("span").text("员工名称重复，请及时更换！");
+							addName =false;
+						}
+					}				
+				});								
 			}else{
 				showValifataMsg("#inputAddName","error","用户名是2-5位中文或6-16位英文和数字的组合！");
 				addName =false;
-			}			
-			$.ajax({
-				url: "${APP_PATH}/checkname",
-				data: "name=" + name,
-				type: "POST",
-				success: function (result) {
-					if(result.code == 100){
-						alert("ok");
-					}else{
-						alert("err");
-					}
-				}				
-			});
-			
+			}
 			
 		});
 		//邮箱验证
@@ -383,17 +386,10 @@
 				$(ele).parent().addClass("has-error");				
 				$(ele).next("span").text(msg);
 			}			
-		}
-		
-		//抽取ajax校验name email
-		function showAjax(){
-			
-		}
-		
-		
+		}	
 
-		// 保存员工的方法
-		$("#empSaveBnt").click(function () {
+		// 保存员工的方法  click事件重复执行的问题    删除 .unbind('click') 移除off()
+		$("#empSaveBnt").off().click(function () {
 			// 1、将模态框中填写的表单数据提交给服务器进行保存			
 			if(!validateAddForm()){
 				return false;				
@@ -407,7 +403,10 @@
 					success: function (result) {
 						// alert(result.msg);
 						// 关闭模态框
-						$('#empAddModal').modal('hide');
+						$('#empAddModal').modal('hide');						
+						//清理数据
+						addName =false;
+						addEmail =false;
 						// 来到最后一页，显示刚才保存数据。
 						to_page(totalRecord, 10);
 					}
