@@ -322,10 +322,8 @@
 		// 校验name email表单数据		
 		//用户名验证		
 		$("#inputAddName").focusout(function() {
-		  	var name = $("#inputAddName").val();		  	
-		  
-			 // 1: 拿到要校验的数据，使用正则表达式
-			 
+		  	var name = $("#inputAddName").val();		  
+			 // 1: 拿到要校验的数据，使用正则表达式			 
 			var regName = /(^[a-zA-Z0-9_-]{6,16}$)|(^[\u2E80-\u9FFF]{2,5}$)/;
 			if(regName.test(name)){
 				$.ajax({
@@ -337,18 +335,15 @@
 							showValifataMsg("#inputAddName","success","用户名正确！");
 							addName =true;
 						}else{
-							$("#inputAddName").parent().removeClass("has-success")
-							$("#inputAddName").parent().addClass("has-error");				
-							$("#inputAddName").next("span").text("员工名称重复，请及时更换！");
+							showValifataMsg("#inputAddName","error",result.extend.va_msg);
 							addName =false;
 						}
 					}				
 				});								
 			}else{
-				showValifataMsg("#inputAddName","error","用户名是2-5位中文或6-16位英文和数字的组合！");
+				showValifataMsg("#inputAddName","error","用户名是2-5位中文或6-16位英文和数字的组合！");				
 				addName =false;
-			}
-			
+			}			
 		});
 		//邮箱验证
 		$("#inputAddEmail").focusout(function() {
@@ -366,10 +361,10 @@
 
 		function validateAddForm(){
 			if(!addName){
-				alert("用户名重复或错误，用户名是2-5位中文或6-16位英文和数字的组合！");	
+				showValifataMsg("#inputAddName","error","用户名重复或错误，用户名是2-5位中文或6-16位英文和数字的组合！");	
 				return false;
 			}else if(!addEmail){
-				alert("邮箱重复或错误，请输入正确邮箱！");	
+				showValifataMsg("#inputAddEmail","error","邮箱错误，请输入正确邮箱！");
 				return false;
 			}
 			return true;
@@ -402,13 +397,23 @@
 					data: $("#empAddModal form").serialize(),
 					success: function (result) {
 						// alert(result.msg);
-						// 关闭模态框
-						$('#empAddModal').modal('hide');						
-						//清理数据
-						addName =false;
-						addEmail =false;
-						// 来到最后一页，显示刚才保存数据。
-						to_page(totalRecord, 10);
+						if(result.code==100){
+							// 关闭模态框
+							$('#empAddModal').modal('hide');						
+							//清理数据
+							addName =false;
+							addEmail =false;
+							// 来到最后一页，显示刚才保存数据。
+							to_page(totalRecord, 10);
+						}else{
+							if(undefined != result.extend.errorFields.name){
+								//显示员工名字信息
+								showValifataMsg("#inputAddName","error",result.extend.errorFields.name);	
+							}else if(undefined != result.extend.errorFields.email){
+								//显示员工邮箱信息
+								showValifataMsg("#inputAddEmail","error",result.extend.errorFields.email);
+							}
+						}	
 					}
 				});		
 		});
