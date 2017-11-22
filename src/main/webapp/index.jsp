@@ -27,6 +27,56 @@
 <script src="${APP_PATH}/staic/js/libs/bootstrap.min.js"></script>
 </head>
 <body>
+
+<!-- 员工修改模态框 -->
+	<div class="modal fade" id="empUpdataModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+	  <div class="modal-dialog" role="document">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+	        <h4 class="modal-title" id="myModalLabel">员工修改添加</h4>
+	      </div>
+	      <div class="modal-body">
+	        <form class="form-horizontal">
+			  <div class="form-group">
+			    <label for="inputEmpName" class="col-sm-2 control-label">姓 名</label>
+			    <div class="col-sm-10">
+			    <p class="form-control-static" id="UpdataName" ></p>
+			    </div>
+			  </div>
+			  <div class="form-group">
+			    <label for="inputEmpEmail" class="col-sm-2 control-label">邮 箱</label>
+			    <div class="col-sm-10">
+			      <input type="email" name="email" class="form-control" id="inputUpdataEmail" placeholder="email@yi.cn">
+			      <span class="help-block"></span>
+			    </div>
+			  </div>
+			  <div class="form-group">
+			    <label for="inputEmpGender" class="col-sm-2 control-label">性 别</label>
+			    <div class="col-sm-10">
+				    <label class="radio-inline">
+						<input type="radio" name="gender" id="inlineUpdataGender1" value="m">男</label>
+					<label class="radio-inline">
+						<input type="radio" name="gender" id="inlineUpdataGender2" value="f">女</label>
+			    </div>
+			  </div>
+			  <div class="form-group">
+			    <label for="inputEmpDeptName" class="col-sm-2 control-label">部 门</label>
+			    <div class="col-sm-3">
+			    <!-- 提交部门id查询 -->
+					<select class="form-control" name="dId"></select>
+			    </div>
+			  </div> 
+			  </form>
+	      </div>
+	      <div class="modal-footer">
+	        <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">关闭</button>
+	        <button type="button" class="btn btn-sm btn-primary" id="empUpdataBnt">修改</button>
+	      </div>	      
+	    </div>
+	  </div>
+	</div>
+	
 	<!-- 员工添加模态框 -->
 	<div class="modal fade" id="empAddModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
 	  <div class="modal-dialog" role="document">
@@ -90,9 +140,9 @@
 		<div class="row">
 			<div class="col-md-2 col-md-offset-10 class="text-center"">				
 				<button type="button" class="btn btn-sm btn-primary" id="empAddModalBnt">
-					<span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>新增</button>
+					<span class="glyphicon glyphicon-pencil" aria-hidden="true"></span> 新增</button>
 				<button type="button" class="btn btn-sm btn-danger">
-					<span class="glyphicon glyphicon-trash" aria-hidden="true"></span>删除</button>
+					<span class="glyphicon glyphicon-trash" aria-hidden="true"></span> 删除</button>
 			</div>
 		</div>
 		<!-- 显示表格数据-->
@@ -160,20 +210,20 @@
 			 * class="glyphicon glyphicon-pencil" aria-hidden="true"></span>修改</button>
 			 */
 			// 构建按钮
-			var eidtBnt = $("<button></button>").addClass("btn btn-xs btn-info")
+			var editBnt = $("<button></button>").addClass("btn btn-xs btn-info edit_bnt")
 				.append($("<span></span>").addClass("glyphicon glyphicon-pencil")).append(" 编辑");
-			var delBnt = $("<button></button>").addClass("btn btn-xs btn-danger")
+			 editBnt.attr("edit_id",item.id);
+			var delBnt = $("<button></button>").addClass("btn btn-xs btn-danger delete_btn")
 				.append($("<span></span>").addClass("glyphicon glyphicon-trash")).append(" 删除");
-
+			delBnt.attr("edit_id",item.id);
 			// 构建表格到#emps_table tbody表格中
 			var empId = $("<td></td>").append(item.id);
 			var empName = $("<td></td>").append(item.name);
 			var empGender = $("<td></td>").append(item.gender == "m" ? "男" : "女");
 			var empEmail = $("<td></td>").append(item.email);
 			var empDepartment = $("<td></td>").append(item.department.deptName);
-			var empBnt = $("<td></td>").addClass("operationwidth").append(eidtBnt)
+			var empBnt = $("<td></td>").addClass("operationwidth").append(editBnt)
 				.append(" ").append(delBnt);
-
 			$("<tr></tr>").append(empId).append(empName).append(empGender).append(
 				empEmail).append(empDepartment).append(empBnt).appendTo(
 				"#emps_table tbody");
@@ -229,7 +279,6 @@
 			// 在ul中添加页码提示
 			ul.append(numLi);
 		});
-
 		var nextPageLi = $("<li></li>").append($("<a></a>").append("»"));
 		var lastPageLi = $("<li></li>").append($("<a></a>").append("末页"));
 
@@ -289,20 +338,52 @@
 		$("#page_nav_area").append(btn_group).append(nav);
 	}
 
-	// 打开模态框
-	$("#empAddModalBnt").unbind('click').click(function () {
+	// 打开添加模态框
+	$("#empAddModalBnt").off().click(function () {
 		// 1: 发送ajax请求，查出部门信息，显示在下拉列表中
-		getDepts();
+		getDepts("#empAddModal select");
 
 		// 2：弹出模态框
 		$('#empAddModal').modal({
 			backdrop: "static"
 		});
 	});
+	
+	// 打开修改模态框
+	// 按钮是jquery创建之前就绑定click，所以绑不上
+	//1: 可以在创建按钮的时候绑定
+	// 2：绑定单击  .live(){} 新版本jquery，已使用  替代方法.on
+	$(document).off().on("click",".edit_bnt",function () {
+		// 1: 发送ajax请求，查出部门信息，显示在下拉列表中
+		getDepts("#empUpdataModal select");	
+		// 2: 发送ajax请求，查出员工信息，显示在模态框中
+		getEmp($(this).attr("edit_id"));
+		// 3：弹出模态框
+		$('#empUpdataModal').modal({
+			backdrop: "static"
+		});
+
+	});
+	
+	// 发送ajax请求，查出员工信息
+	function getEmp(id){
+		$.ajax({
+			url: "${APP_PATH}/emp/"+id,
+			type: "GET",
+			success: function (result) {				
+				var empData = result.extend.emp;
+				//console.log(empData);
+				$("#UpdataName").text(empData.name);	
+				$("#inputUpdataEmail").val(empData.email);
+				$("#empUpdataModal input[name=gender]").val([empData.gender]);
+				$("#empUpdataModal select").val([empData.dId]);				
+			}				
+		});
+	}
 
 	// 发送ajax请求，查出部门信息，显示在下拉列表中
-	function getDepts() {	
-		$("#empAddModal select") .empty();
+	function getDepts(ele) {	
+		$(ele) .empty();
 		$.ajax({
 			url: "${APP_PATH}/depts",
 			type: "GET",
@@ -311,7 +392,7 @@
 				// 两种写法 一种传参 一种部传参
 				$.each( result.extend.depts, function(index, item){ 
 					$("<option></option>").val(item.deptId)
-					.append(item.deptName).appendTo("#empAddModal select"); 
+					.append(item.deptName).appendTo(ele); 
 				}); 				 
 				/* $.each(result.extend.depts, function () {
 					$("<option></option>").val(this.deptId).append(this.deptName)
@@ -386,6 +467,7 @@
 
 		// 保存员工的方法  click事件重复执行的问题    删除 .unbind('click') 移除off()
 		$("#empSaveBnt").off().click(function () {
+			
 			// 1、将模态框中填写的表单数据提交给服务器进行保存			
 			if(!validateAddForm()){
 				return false;				

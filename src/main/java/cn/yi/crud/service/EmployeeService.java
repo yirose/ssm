@@ -32,7 +32,6 @@ public class EmployeeService {
 	public void saveEmp(Employee employee) {
 		employeeMapper.insertSelective(employee);		
 	}
-
 	
 	/**
 	 * 检验员工姓名是否登记
@@ -46,4 +45,15 @@ public class EmployeeService {
 		long count = employeeMapper.countByExample(example);
 		return count == 0 ;
 	}
+
+	/**
+	 * 按照员工id查询出来员工信息
+	 * @param id
+	 * @return
+	 */
+	public Employee getEmp(Integer id) {
+		Employee employee = employeeMapper.selectByPrimaryKey(id);
+		return employee;
+	}
+
 }
