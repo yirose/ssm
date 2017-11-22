@@ -175,6 +175,7 @@
 <script type="text/javascript">
 	var addName;
 	var addEmail;
+	var updataEmail;
 	var totalRecord;
 	
 	// 1、页面加载完成以后，直接去发送一个ajax请求，要到分页数据
@@ -382,7 +383,7 @@
 	}
 
 	// 发送ajax请求，查出部门信息，显示在下拉列表中
-	function getDepts(ele) {	
+	function getDepts(ele){	
 		$(ele) .empty();
 		$.ajax({
 			url: "${APP_PATH}/depts",
@@ -402,105 +403,131 @@
 		});
 		
 		// 校验name email表单数据		
-		//用户名验证		
-		$("#inputAddName").off().focusout(function() {
-		  	var name = $("#inputAddName").val();		  
-			 // 1: 拿到要校验的数据，使用正则表达式			 
-			var regName = /(^[a-zA-Z0-9_-]{6,16}$)|(^[\u2E80-\u9FFF]{2,5}$)/;
-			if(regName.test(name)){
-				$.ajax({
-					url: "${APP_PATH}/checkname",
-					data: "name=" + name,
-					type: "POST",
-					success: function (result) {
-						if(result.code == 100){
-							showValifataMsg("#inputAddName","success","用户名正确！");
-							addName =true;
-						}else{
-							showValifataMsg("#inputAddName","error",result.extend.va_msg);
-							addName =false;
-						}
-					}				
-				});								
-			}else{
-				showValifataMsg("#inputAddName","error","用户名是2-5位中文或6-16位英文和数字的组合！");				
-				addName =false;
-			}			
-		});
-		//邮箱验证
-		$("#inputAddEmail").off().focusout(function() {
-			var name = $("#inputAddEmail").val();
-			var regName = /^[a-z\d]+(\.[a-z\d]+)*@([\da-z](-[\da-z])?)+(\.{1,2}[a-z]+)+$/;
-			if(regName.test(name)){
-				showValifataMsg("#inputAddEmail","success","邮箱正确！");
-				
-				addEmail =true;
-			}else{
-				showValifataMsg("#inputAddEmail","error","邮箱错误，请输入正确邮箱！");
-				addEmail =false;
-			}
-		});
-
-		function validateAddForm(){
-			if(!addName){
-				showValifataMsg("#inputAddName","error","用户名重复或错误，用户名是2-5位中文或6-16位英文和数字的组合！");	
-				return false;
-			}else if(!addEmail){
-				showValifataMsg("#inputAddEmail","error","邮箱错误，请输入正确邮箱！");
-				return false;
-			}
-			return true;
-		} 
-
-		//抽取showValifataMsg
-		function showValifataMsg(ele,status,msg){			
-			if("success"==status){
-				$(ele).parent().removeClass("has-error")
-				$(ele).parent().addClass("has-success");				
-				$(ele).next("span").text("");
-			}else if("error"==status){
-				$(ele).parent().removeClass("has-success")
-				$(ele).parent().addClass("has-error");				
-				$(ele).next("span").text(msg);
-			}			
-		}	
-
-		// 保存员工的方法  click事件重复执行的问题    删除 .unbind('click') 移除off()
-		$("#empSaveBnt").off().click(function () {
-			
-			// 1、将模态框中填写的表单数据提交给服务器进行保存			
-			if(!validateAddForm()){
-				return false;				
-			}
-				// 2、发送ajax请求保存员工
-				$.ajax({
-					url: "${APP_PATH}/emp",
-					type: "POST",
-					// jquery serialize() 序列表表格内容为字符串。
-					data: $("#empAddModal form").serialize(),
-					success: function (result) {
-						// alert(result.msg);
-						if(result.code==100){
-							// 关闭模态框
-							$('#empAddModal').modal('hide');						
-							//清理数据
-							addName =false;
-							addEmail =false;
-							// 来到最后一页，显示刚才保存数据。
-							to_page(totalRecord, 10);
-						}else{
-							if(undefined != result.extend.errorFields.name){
-								//显示员工名字信息
-								showValifataMsg("#inputAddName","error",result.extend.errorFields.name);	
-							}else if(undefined != result.extend.errorFields.email){
-								//显示员工邮箱信息
-								showValifataMsg("#inputAddEmail","error",result.extend.errorFields.email);
-							}
-						}	
+		//用户名添加验证		
+	$("#inputAddName").off().focusout(function() {
+	  	var name = $("#inputAddName").val();		  
+		 // 1: 拿到要校验的数据，使用正则表达式			 
+		var regName = /(^[a-zA-Z0-9_-]{6,16}$)|(^[\u2E80-\u9FFF]{2,5}$)/;
+		if(regName.test(name)){
+			$.ajax({
+				url: "${APP_PATH}/checkname",
+				data: "name=" + name,
+				type: "POST",
+				success: function (result) {
+					if(result.code == 100){
+						showValifataMsg("#inputAddName","success","用户名正确！");
+						addName =true;
+					}else{
+						showValifataMsg("#inputAddName","error",result.extend.va_msg);
+						addName =false;
 					}
-				});		
-		});
+				}				
+			});								
+		}else{
+			showValifataMsg("#inputAddName","error","用户名是2-5位中文或6-16位英文和数字的组合！");				
+			addName =false;
+		}			
+	});
+		
+	//邮箱添加验证
+	$("#inputAddEmail").off().focusout(function() {
+		validateEmail("#inputAddEmail",addEmail)
+	});
+	
+	//邮箱修改验证
+	$("#inputUpdataEmail").off().focusout(function() {
+		validateEmail("#inputUpdataEmail",updataEmail)
+	});
+	
+	//邮箱验证抽取
+	function validateEmail(ele,email){
+		var name = $(ele).val();
+		var regName = /^[a-z\d]+(\.[a-z\d]+)*@([\da-z](-[\da-z])?)+(\.{1,2}[a-z]+)+$/;
+		if(regName.test(name)){
+			showValifataMsg(ele,"success","邮箱正确！");
+			
+			email =true;
+		}else{
+			showValifataMsg(ele,"error","邮箱错误，请输入正确邮箱！");
+			email =false;
+		}
 	}
-	</script>
+
+	function validateAddForm(){
+		if(!addName){
+			showValifataMsg("#inputAddName","error","用户名重复或错误，用户名是2-5位中文或6-16位英文和数字的组合！");	
+			return false;
+		}else if(!addEmail){
+			showValifataMsg("#inputAddEmail","error","邮箱错误，请输入正确邮箱！");
+			return false;
+		}
+		return true;
+	}
+
+	function validateUpdataForm(){
+		alert("vaUpdata");
+		return false;
+	} 
+	
+
+	//抽取showValifataMsg
+	function showValifataMsg(ele,status,msg){			
+		if("success"==status){
+			$(ele).parent().removeClass("has-error")
+			$(ele).parent().addClass("has-success");				
+			$(ele).next("span").text("");
+		}else if("error"==status){
+			$(ele).parent().removeClass("has-success")
+			$(ele).parent().addClass("has-error");				
+			$(ele).next("span").text(msg);
+		}			
+	}	
+
+	// 保存员工的方法  click事件重复执行的问题    删除 .unbind('click') 移除off()
+	$("#empSaveBnt").off().click(function(){
+		//将模态框中填写的表单数据检验
+		if(!validateAddForm()){
+			return false;				
+		}
+		// 1、将模态框中填写的表单数据提交给服务器进行保存
+		// 2、发送ajax请求保存员工
+		$.ajax({
+			url: "${APP_PATH}/emp",
+			type: "POST",
+			// jquery serialize() 序列表表格内容为字符串。
+			data: $("#empAddModal form").serialize(),
+			success: function (result) {
+				// alert(result.msg);
+				if(result.code==100){
+					// 关闭模态框
+					$('#empAddModal').modal('hide');						
+					//清理数据
+					addName =false;
+					addEmail =false;
+					// 来到最后一页，显示刚才保存数据。
+					to_page(totalRecord, 10);
+				}else{
+					if(undefined != result.extend.errorFields.name){
+						//显示员工名字信息
+						showValifataMsg("#inputAddName","error",result.extend.errorFields.name);	
+					}else if(undefined != result.extend.errorFields.email){
+						//显示员工邮箱信息
+						showValifataMsg("#inputAddEmail","error",result.extend.errorFields.email);
+					}
+				}	
+			}
+		});		
+	});
+	
+	//修改员工的方法
+	$("#empUpdataBnt").off().click(function(){
+		// 1、将模态框中填写的表单检验
+		if(validateUpdataForm()){
+			return false;
+		}
+		// 2、发送ajax请求修改员工
+	});		
+}
+</script>
 </body>
 </html>
