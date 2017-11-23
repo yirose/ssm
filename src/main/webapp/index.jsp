@@ -141,7 +141,7 @@
 			<div class="col-md-2 col-md-offset-10 class="text-center"">				
 				<button type="button" class="btn btn-sm btn-primary" id="empAddModalBnt">
 					<span class="glyphicon glyphicon-pencil" aria-hidden="true"></span> 新增</button>
-				<button type="button" class="btn btn-sm btn-danger">
+				<button type="button" class="btn btn-sm btn-danger" id="empDeleteAllBnt">
 					<span class="glyphicon glyphicon-trash" aria-hidden="true"></span> 删除</button>
 			</div>
 		</div>
@@ -151,6 +151,7 @@
 			<table class="table table-hover table-bordered" id="emps_table">
 				<thead>
 					<tr>
+						<th><input type='checkbox'  id='cjeckAll' /></th>
 						<th>ID</th>
 						<th>姓名</th>
 						<th>性别</th>
@@ -173,10 +174,7 @@
 		</div>
 	</div>	
 <script type="text/javascript">
-	var addName;
-	var addEmail;
-	var updataEmail;
-	var totalRecord;
+	var addName, addEmail, updataEmail, totalRecord ,curremtPage;
 	
 	// 1、页面加载完成以后，直接去发送一个ajax请求，要到分页数据
 	$(function () {
@@ -216,8 +214,9 @@
 			 editBnt.attr("edit_id",item.id);
 			var delBnt = $("<button></button>").addClass("btn btn-xs btn-danger delete_btn")
 				.append($("<span></span>").addClass("glyphicon glyphicon-trash")).append(" 删除");
-			delBnt.attr("edit_id",item.id);
+			delBnt.attr("delete_id",item.id);
 			// 构建表格到#emps_table tbody表格中
+			var checkBox = $("<td></td>").append("<input type='checkbox' class='check_item'/>");
 			var empId = $("<td></td>").append(item.id);
 			var empName = $("<td></td>").append(item.name);
 			var empGender = $("<td></td>").append(item.gender == "m" ? "男" : "女");
@@ -225,7 +224,7 @@
 			var empDepartment = $("<td></td>").append(item.department.deptName);
 			var empBnt = $("<td></td>").addClass("operationwidth").append(editBnt)
 				.append(" ").append(delBnt);
-			$("<tr></tr>").append(empId).append(empName).append(empGender).append(
+			$("<tr></tr>").append(checkBox).append(empId).append(empName).append(empGender).append(
 				empEmail).append(empDepartment).append(empBnt).appendTo(
 				"#emps_table tbody");
 		})
@@ -246,7 +245,9 @@
 		var navNums = pageInfo.navigatepageNums;
 		var pageNum = pageInfo.pageNum;
 		var pages = pageInfo.pages;
+		
 		totalRecord = pageInfo.total;
+		curremtPage = pageNum;
 		// <li><a href="${APP_PATH}/emps?pn=1">首页</a>
 		var ul = $("<ul></ul>").addClass("pagination page_nav_lh");
 		var firstPageLi = $("<li></li>").append($("<a></a>").append("首页"));
@@ -354,16 +355,18 @@
 	// 按钮是jquery创建之前就绑定click，所以绑不上
 	//1: 可以在创建按钮的时候绑定
 	// 2：绑定单击  .live(){} 新版本jquery，已使用  替代方法.on
-	$(document).off().on("click",".edit_bnt",function () {
+	
+	$(document).on("click",".edit_bnt",function () {
 		// 1: 发送ajax请求，查出部门信息，显示在下拉列表中
 		getDepts("#empUpdataModal select");	
-		// 2: 发送ajax请求，查出员工信息，显示在模态框中
+		// 2: 发送ajax请求，查出员工信息，显示在模态框中		
 		getEmp($(this).attr("edit_id"));
-		// 3：弹出模态框
+		//3：把员工id传递给模态框的更新按钮
+		$("#empUpdataBnt").attr("edit_id",$(this).attr("edit_id"));
+		// 4：弹出模态框
 		$('#empUpdataModal').modal({
 			backdrop: "static"
 		});
-
 	});
 	
 	// 发送ajax请求，查出员工信息
@@ -401,10 +404,11 @@
 				}); */
 			}
 		});
+}
 		
 		// 校验name email表单数据		
 		//用户名添加验证		
-	$("#inputAddName").off().focusout(function() {
+	$("#inputAddName").focusout(function() {
 	  	var name = $("#inputAddName").val();		  
 		 // 1: 拿到要校验的数据，使用正则表达式			 
 		var regName = /(^[a-zA-Z0-9_-]{6,16}$)|(^[\u2E80-\u9FFF]{2,5}$)/;
@@ -430,12 +434,12 @@
 	});
 		
 	//邮箱添加验证
-	$("#inputAddEmail").off().focusout(function() {
+	$("#inputAddEmail").focusout(function() {
 		validateEmail("#inputAddEmail",addEmail)
 	});
 	
 	//邮箱修改验证
-	$("#inputUpdataEmail").off().focusout(function() {
+	$("#inputUpdataEmail").focusout(function() {
 		validateEmail("#inputUpdataEmail",updataEmail)
 	});
 	
@@ -444,8 +448,7 @@
 		var name = $(ele).val();
 		var regName = /^[a-z\d]+(\.[a-z\d]+)*@([\da-z](-[\da-z])?)+(\.{1,2}[a-z]+)+$/;
 		if(regName.test(name)){
-			showValifataMsg(ele,"success","邮箱正确！");
-			
+			showValifataMsg(ele,"success","邮箱正确！");			
 			email =true;
 		}else{
 			showValifataMsg(ele,"error","邮箱错误，请输入正确邮箱！");
@@ -465,7 +468,10 @@
 	}
 
 	function validateUpdataForm(){
-		alert("vaUpdata");
+		if(!updataEmail){
+			showValifataMsg("#inputAddEmail","error","邮箱错误，请输入正确邮箱！");		
+			return false;
+		}
 		return false;
 	} 
 	
@@ -526,8 +532,83 @@
 			return false;
 		}
 		// 2、发送ajax请求修改员工
-	});		
-}
+		$.ajax({
+			url: "${APP_PATH}/emp/"+$(this).attr("edit_id"),		
+			//PUT方法
+			type: "PUT",
+			data: $("#empUpdataModal form").serialize(), 
+			/* POST  转换PUT方法
+			type: "POST",
+			data: $("#empUpdataModal form").serialize()+"&_method=PUT", */
+			success: function(result){					
+				//console.log(result);
+				if(result.code==100){
+					// 关闭模态框
+					$('#empUpdataModal').modal('hide');						
+					//清理数据
+					updataEmail =false;
+					// 来到最后一页，显示刚才保存数据。
+					to_page(curremtPage, 10);
+				}
+			}			
+		});		
+	});	
+	
+	//全选或全部取消按钮
+	$("#cjeckAll").click(function(){
+		//alert($(this).prop("checked"));
+		$(".check_item").prop("checked",$(this).prop("checked"));
+	});
+	
+	//check_item
+	$(document).on("click",".check_item",function(){	
+		//alert($(".check_item").length);	
+		var flag = $(".check_item:checked").length==$(".check_item").length;
+		if(flag){
+			$("#cjeckAll").prop("checked",$(this).prop("checked"));
+		}else{
+			$("#cjeckAll").prop("checked",flag);
+		}
+	});
+	
+	//员工删除
+	$(document).on("click",".delete_btn",function(){
+		var empName = $(this).parents("tr").find("td:eq(2)").text();
+		if(confirm("确认删除【"+empName+"】吗？")){
+			$.ajax({
+				url: "${APP_PATH}/emp/"+$(this).attr("delete_id"),
+				type: "DELETE",
+				success: function(result){
+					alert(result.msg);
+					to_page(curremtPage, 10);
+				}					
+			});			
+		}
+		//alert(empName);		
+	});
+	
+	//多选员工删除
+	$("#empDeleteAllBnt").click(function(){
+		var empNames = "";
+		var empIds = "";		
+		$.each($(".check_item:checked"),function(){
+			empNames += $(this).parents("tr").find("td:eq(2)").text()+",";
+			empIds += $(this).parents("tr").find("td:eq(1)").text()+"-";
+		});
+		empNames = empNames.substring(0,empNames.length-1);
+		empIds = empIds.substring(0,empIds.length-1);		
+		if(confirm("确认删除【"+empNames+"】吗？")){
+			$.ajax({
+				url: "${APP_PATH}/emp/"+empIds,
+				type: "DELETE",
+				success: function(result){
+					alert(result.msg);
+					to_page(curremtPage, 10);
+				}					
+			});				
+		}
+	});
+	
 </script>
 </body>
 </html>

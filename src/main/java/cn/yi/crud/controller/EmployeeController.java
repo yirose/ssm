@@ -1,10 +1,12 @@
 package cn.yi.crud.controller;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 import javax.validation.Valid;
 
+import org.eclipse.jdt.internal.compiler.parser.ParserBasicInformation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -37,6 +39,62 @@ public class EmployeeController {
 
 	@Autowired
 	EmployeeService employeeService;
+	
+	/**
+	 * 单个员工删除方法
+	 * @param id
+	 * @return
+	 */
+/*	@RequestMapping(value="/emp/{id}",method=RequestMethod.DELETE)
+	@ResponseBody
+	public Msg deleteEmpById(@PathVariable("id") Integer id){
+		employeeService.deleteEmp(id);
+		System.out.println(id);
+		return Msg.success();		
+	}*/
+	
+	/**
+	 * 单个&多个员工删除方法
+	 * @param id
+	 * @return
+	 */
+	@RequestMapping(value="/emp/{ids}",method=RequestMethod.DELETE)
+	@ResponseBody
+	public Msg deleteEmp(@PathVariable("ids") String ids){
+		if(ids.contains("-")){
+			List<Integer> del_ids = new ArrayList<>();
+			String[] str_ids = ids.split("-");			
+			//组装的集合
+			for (String string : str_ids) {
+				del_ids.add(Integer.parseInt(string)) ;
+			}			
+			employeeService.deleteBatch(del_ids);
+		}else{
+			Integer id = Integer.parseInt(ids);
+			employeeService.deleteEmp(id);
+		}
+		return Msg.success();		
+	}
+	
+	/**
+	 * 如果直接发送ajax=PUT 形式请求
+	 * Employee封装不上数据。提示出错
+	 * 
+	 *  原因：Tomcat 不支持问题
+	 * 
+	 * 解决办法
+	 * 在web.xml  配置过滤器 HttpPutFormContentFilter
+	 * 
+	 * 员工修改保存
+	 * @param employee
+	 * @return
+	 */
+	@RequestMapping(value="/emp/{id}",method=RequestMethod.PUT)
+	@ResponseBody
+	public Msg saveEmp(Employee employee){
+		employeeService.updataEmp(employee);
+		return Msg.success();		
+	}
 	
 	/**
 	 * 查询员工数据
