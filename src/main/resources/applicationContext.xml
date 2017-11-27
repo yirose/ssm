@@ -11,8 +11,7 @@
 		<!-- 只扫描Controller控制器 -->
 		<context:include-filter type="annotation"
 			expression="org.springframework.stereotype.Controller" />
-	</context:component-scan>
-	
+	</context:component-scan>	
 	
 	<!-- Spring的配置，这里主要配置和设置业务逻辑 -->
 	<!-- ==================数据源，事务控制 ……===================== -->

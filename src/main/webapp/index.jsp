@@ -138,7 +138,9 @@
 		</div>
 		<!-- 按钮 -->
 		<div class="row">
-			<div class="col-md-2 col-md-offset-10 class="text-center"">				
+			<div class="col-md-3 col-md-offset-9 class="text-center"">		
+			<button type="button" class="btn btn-sm btn-primary" id="loginModalBnt">
+					<span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>用户登录</button>		
 				<button type="button" class="btn btn-sm btn-primary" id="empAddModalBnt">
 					<span class="glyphicon glyphicon-pencil" aria-hidden="true"></span> 新增</button>
 				<button type="button" class="btn btn-sm btn-danger" id="empDeleteAllBnt">
