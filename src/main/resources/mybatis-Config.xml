@@ -9,7 +9,7 @@
 		<setting name="mapUnderscoreToCamelCase" value="true" />
 	</settings>
 	<typeAliases>
-		<package name="cn.yi.crud.bean" />
+		<package name="com.yi.bean" />
 	</typeAliases>
 	<plugins>
 		<plugin interceptor="com.github.pagehelper.PageInterceptor">

@@ -5,7 +5,9 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>Login Page</title>
-
+<%
+	pageContext.setAttribute("APP_PATH", request.getContextPath());
+%>
 <link href="${APP_PATH}/staic/css/bootstrap.min.css" rel="stylesheet">
 <script src="${APP_PATH}/staic/js/libs/jquery-3.2.1.min.js"></script>
 <script src="${APP_PATH}/staic/js/libs/bootstrap.min.js"></script>

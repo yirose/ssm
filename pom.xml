@@ -6,6 +6,21 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>war</packaging>
 
+	<properties>
+		<!-- 编码 -->
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<!-- 跳过测试 -->
+		<maven.test.skip>true</maven.test.skip>
+
+		<!-- spring版本 -->
+		<spring.version>4.2.4.RELEASE</spring.version>
+		<!-- mybatis版本 -->
+		<mybatis.version>3.3.0</mybatis.version>
+		<!-- 控制日志版本 -->
+		<slf4j.version>1.7.7</slf4j.version>
+		<log4j.version>1.2.17</log4j.version>
+	</properties>
+
 	<!-- 引入项目依赖的jar包 -->
 	<!-- SpringMVC Spring -->
 	<!-- https://mvnrepository.com/artifact/org.springframework/spring-webmvc -->
@@ -111,22 +126,41 @@
 			<groupId>com.github.pagehelper</groupId>
 			<artifactId>pagehelper</artifactId>
 			<version>5.1.2</version>
-		</dependency>		
-		
+		</dependency>
+
 		<!-- 引入JSON解析 jackson包 -->
 		<!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
-<dependency>
-    <groupId>com.fasterxml.jackson.core</groupId>
-    <artifactId>jackson-databind</artifactId>
-    <version>2.9.0</version>
-</dependency>	
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>2.9.0</version>
+		</dependency>
 
-<!-- 引入JSR303校验  jackson包 -->
-<!-- https://mvnrepository.com/artifact/org.hibernate/hibernate-validator -->
-<dependency>
-    <groupId>org.hibernate</groupId>
-    <artifactId>hibernate-validator</artifactId>
-    <version>5.4.1.Final</version>
-</dependency>
+		<!-- 引入JSR303校验 jackson包 -->
+		<!-- https://mvnrepository.com/artifact/org.hibernate/hibernate-validator -->
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-validator</artifactId>
+			<version>5.4.1.Final</version>
+		</dependency>
+
+		<!--redis -->
+		<dependency>
+			<groupId>org.springframework.data</groupId>
+			<artifactId>spring-data-redis</artifactId>
+			<version>1.7.2.RELEASE</version>
+		</dependency>
+		<dependency>
+			<groupId>redis.clients</groupId>
+			<artifactId>jedis</artifactId>
+			<version>2.8.0</version>
+		</dependency>
+		<!-- 日志文件管理包 -->
+		<!-- log start_1 -->
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<version>${log4j.version}</version>
+		</dependency>
 	</dependencies>
 </project>
